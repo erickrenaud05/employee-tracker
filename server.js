@@ -1,5 +1,6 @@
 const express = require('express');
 const { Pool } = require('pg');
+require('dotenv').config();
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -9,10 +10,11 @@ app.use(express.json());
 
 const pool = new Pool(
     {
-      user: 'postgres',
-      password: 'password',
+      //enter personal db information  
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
       host: 'localhost',
-      database: 'employees_db'
+      database: process.env.DB_NAME
     },
     console.log(`listening on port ${PORT}.`)
 )
