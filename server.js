@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const inquirer = require('inquirer');
 const startPrompt = require('./helpers/prompt');
+const drawLogo = require('./helpers/logo');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3001;
@@ -24,9 +25,9 @@ const pool = new Pool(
 async function connectToDatabase() {
     try {
         await pool.connect();
-        
+
+        drawLogo();//Logo by UofT coding bootcamp
         startPrompt();
-        
     } catch (err) {
         console.log(err);
         return 1
