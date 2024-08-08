@@ -1,8 +1,8 @@
-class DEPARTMENT {
+class Department {
     constructor(id, name){
         this.id = id;
         this.name = name;
     }
 }
 
-module.exports = DEPARTMENT;
+module.exports = Department;

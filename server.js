@@ -23,4 +23,8 @@ pool.connect();
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-  });
+});
+
+pool.query('SELECT * FROM department', (err, {rows})=>{
+    console.log(rows);
+})
