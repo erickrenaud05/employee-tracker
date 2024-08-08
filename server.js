@@ -10,7 +10,7 @@ app.use(express.json());
 
 const pool = new Pool(
     {
-      //enter personal db information  
+      //Create .env file with the following information  DB_USER, DB_PASSWORD, DB_NAME (DB_NAME) should be employees_db
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       host: 'localhost',
