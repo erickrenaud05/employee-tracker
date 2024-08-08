@@ -27,7 +27,7 @@ async function connectToDatabase() {
         await pool.connect();
 
         drawLogo();//Logo by UofT coding bootcamp
-        startPrompt();
+        startPrompt(pool);
     } catch (err) {
         console.log(err);
         return 1
