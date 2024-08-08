@@ -1,4 +1,4 @@
-class ROLE {
+class Role {
     constructor(id, title, salary, departmentId){
         this.id = id;
         this.title = title;
@@ -7,4 +7,4 @@ class ROLE {
     }
 }
 
-module.exports = ROLE;
+module.exports = Role;
