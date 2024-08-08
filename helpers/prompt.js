@@ -3,7 +3,7 @@ const inquirer = require('inquirer');
 module.exports = async function startPrompt() {
     var exit = false;
     const myChoices = [
-        'Exit',
+        'Exit Employee Manager',
         'View All Employees',
         'Add Employees',
         'Update Employee Role',
