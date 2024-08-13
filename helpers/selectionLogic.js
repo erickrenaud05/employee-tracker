@@ -1,4 +1,5 @@
 const formTable = require('./table');
+const inquirer = require('inquirer');
 
 const viewEmployeeQuery = 
 `
@@ -31,6 +32,11 @@ async function viewRole(pool){
     console.log(formTable(res.rows));
 }
 
+async function viewBudget(pool){
+    const res = await pool.query(`SELECT d.name AS department_name, SUM(r.salary) AS total_salary_spent FROM department d JOIN role r ON d.id = r.department_id JOIN employee e ON r.id = e.role_id GROUP BY d.name;`)
+    console.log(formTable(res.rows));
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
@@ -38,6 +44,18 @@ function exitEmployeeManager(){
 myMap.set('View All Employees', viewEmployee);
 myMap.set('Exit Employee Manager', exitEmployeeManager);
 myMap.set('View All Roles', viewRole);
+myMap.set('View Total Utilized Budget Of A Department', viewBudget);
+myMap.set('View Employee By Department', )
+myMap.set('View Employee By Manager', )
+myMap.set('View All Department', )
+myMap.set('Add Employees', )
+myMap.set('Add Role', )
+myMap.set('Add Department', )
+myMap.set('Update Employee Role', )
+myMap.set('Update Employee Manager', )
+myMap.set('Delete Department(s)', )
+myMap.set('Delete Role(s)', )
+myMap.set('Delete Employee(s)', )
 
 module.exports = myMap;
 
