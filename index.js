@@ -1,6 +1,7 @@
 const pool = require('./db/index');
 const inquirer = require('inquirer');
 const myMap = require('./helpers/selectionLogic');
+const drawLogo = require('./helpers/logo');
 
 const myChoices = [
     'Exit Employee Manager',
@@ -33,13 +34,14 @@ async function main() {
         name: 'selection',
         choices: myChoices,
     })
-    .then((answer) => {
+    .then(async (answer) => {
         const selection = myMap.get(answer.selection);
-        selection();
+        await selection(pool);
+        main()
     })
 }
 
-
+drawLogo();
 main();
 
 
