@@ -34,25 +34,41 @@ async function viewRole(pool){
 }
 
 async function viewBudget(pool){
-    const res = await pool.query(`SELECT d.name AS department_name, SUM(r.salary) AS total_salary_spent FROM department d JOIN role r ON d.id = r.department_id JOIN employee e ON r.id = e.role_id GROUP BY d.name;`)
-    let promptChoices = ['View all departments total utilized budget'];
-    promptChoices.push(res.rows.map((x) => 'View ' + x.department_name + ' department total utilized budget'));
+    const res = await pool.query(`SELECT name FROM department`)
+    let promptChoices = ['All departments'];
+    promptChoices.push(res.rows);
     promptChoices = promptChoices.flat();
 
     await inquirer
         .prompt({
             type: 'list',
-            message: 'What would you like to do?',
+            message: 'Select which departments total utilized budget to view',
             name: 'selection',
             choices: promptChoices,
-        }).then((answer)=>{
-            for(let choices of res.rows) {
-                if(answer.selection.includes(choices.department_name)){
-                    console.log(formTable([choices]));
-                    return;
-                }
+        }).then(async (answer)=>{
+            if(answer.selection === 'All departments'){
+                const newRes = await pool.query(`SELECT d.name AS department_name, SUM(r.salary) AS total_salary_spent FROM department d JOIN role r ON d.id = r.department_id JOIN employee e ON r.id = e.role_id GROUP BY d.name;`)
+                console.log(formTable(newRes.rows));
+                return;
             }
-            console.log(formTable(res.rows));
+            console.log(answer.selection)
+            const newRes = await pool.query(`SELECT SUM(r.salary) AS total_utilized_budget FROM employee e JOIN role r ON e.role_id = r.id JOIN department d ON r.department_id = d.id WHERE LOWER(d.name) = LOWER('${answer.selection}');`)
+            console.log(formTable(newRes.rows));
+        })
+}
+
+async function viewEmployeeByDepartment(pool){
+    const res = await pool.query(`SELECT name FROM department`);
+    
+    await inquirer
+        .prompt({
+            type: 'list',
+            message: 'Select which departments employees to view',
+            name: 'selection',
+            choices: res.rows,
+        }).then(async (answer)=>{
+            const newRes = await pool.query(`SELECT * FROM department WHERE department.name=${answer.selection}`)
+            console.log(formTable(newRes));
         })
 }
 
@@ -64,7 +80,7 @@ myMap.set('View All Employees', viewEmployee);
 myMap.set('Exit Employee Manager', exitEmployeeManager);
 myMap.set('View All Roles', viewRole);
 myMap.set('View Total Utilized Budget Of A Department', viewBudget);
-myMap.set('View Employee By Department', )
+myMap.set('View Employee By Department', viewEmployeeByDepartment)
 myMap.set('View Employee By Manager', )
 myMap.set('View All Department', )
 myMap.set('Add Employees', )

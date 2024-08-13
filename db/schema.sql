@@ -37,6 +37,18 @@ JOIN
 GROUP BY 
     d.name;
 
+-- Query for single departments total utilized budget
+SELECT 
+    SUM(r.salary) AS total_utilized_budget
+FROM 
+    employee e
+JOIN 
+    role r ON e.role_id = r.id
+JOIN 
+    department d ON r.department_id = d.id
+WHERE 
+    LOWER(d.name) = LOWER('${answer.selection}');
+
 -- Query for view employee function
 SELECT
     e.id AS id,
@@ -65,3 +77,4 @@ FROM
     role r 
 LEFT JOIN 
     department d ON r.department_id=d.id
+
