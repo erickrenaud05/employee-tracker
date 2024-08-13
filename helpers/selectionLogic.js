@@ -292,6 +292,46 @@ async function updateEmployeeManager(pool){
         })
 }
 
+async function deleteEmployees(pool){
+    const res = await pool.query(`SELECT CONCAT(first_name, ' ', last_name) FROM employee`);
+    const employees = res.rows.map((x) => x.concat);
+
+    employees.push(new inquirer.Separator());
+
+    await inquirer
+        .prompt([
+            {
+                type: 'checkbox',
+                name: 'employees',
+                message: 'Select employee or employees you would like to delete: ',
+                choices: employees,
+            },
+            {
+                type: 'confirm',
+                name: 'doubleCheck',
+                message: 'Are you sure you wish to delete the selected employees, this is irreversible!',
+            }
+        ]).then(async(answer) => {
+            if(!answer.doubleCheck){
+                console.log('\nOK! No employees have been deleted!\n');
+                return;
+            }
+            for(let i = 0; i < answer.employees.length; i++){
+                const res = await pool.query(`SELECT id FROM employee WHERE CONCAT(first_name, ' ', last_name)='${answer.employees[i]}'`)
+                const employeeId = res.rows[0].id;
+                console.log(employeeId)
+                try{
+                    await pool.query(`DELETE FROM employee WHERE id = '${employeeId}';`)
+                } catch(err){
+                    console.log(err);
+                    return;
+                }
+            }
+
+            console.log(`\nSuccessfully deleted the following employee('s): ${answer.employees}\n`);
+        })
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
@@ -310,7 +350,7 @@ myMap.set('Update Employee Role', updateEmployeeRole)
 myMap.set('Update Employee Manager', updateEmployeeManager)
 myMap.set('Delete Department(s)', )
 myMap.set('Delete Role(s)', )
-myMap.set('Delete Employee(s)', )
+myMap.set('Delete Employee(s)', deleteEmployees)
 
 module.exports = myMap;
 

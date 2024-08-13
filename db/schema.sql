@@ -127,3 +127,15 @@ VALUES ('FirstName', 'LastName', role_id_value, manager_id_value);
 UPDATE employee
 SET role_id = new_role_id
 WHERE id = employee_id;
+
+-- Query to delete role
+DELETE FROM role
+WHERE id = role_id;
+
+-- Query to delete employee
+DELETE FROM employee
+WHERE id = employee_id;
+
+-- Query to delete department
+DELETE FROM department
+WHERE id = department_id;
