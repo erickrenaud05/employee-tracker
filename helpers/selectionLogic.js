@@ -256,6 +256,42 @@ async function updateEmployeeRole(pool){
         })
 }
 
+async function updateEmployeeManager(pool){
+    const res = await pool.query(`SELECT CONCAT(first_name, ' ', last_name) FROM employee`);
+    const employees = res.rows.map((x) => x.concat);
+
+    employees.push(new inquirer.Separator());
+
+    await inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'employee',
+                message: 'Select which employee you would like to update: ',
+                choices: employees,
+            },
+            {
+                type: 'list',
+                name: 'manager',
+                message: 'Select the employees new manager: ',
+                choices: employees,
+            }
+        ]).then(async (answer) => {
+            const res = await pool.query(`SELECT id FROM employee WHERE CONCAT(first_name, ' ', last_name)='${answer.employee}'`)
+            const employeeId = res.rows[0].id;
+            const mRes = await pool.query(`SELECT id FROM employee WHERE CONCAT(first_name, ' ', last_name)='${answer.manager}'`)
+            const managerId = mRes.rows[0].id;
+
+            try{
+                await pool.query(`UPDATE employee SET manager_id = '${managerId}' WHERE id = '${employeeId}';`)
+            } catch(err){
+                console.log(err);
+                return;
+            }
+            console.log(`\nSuccessfully updated ${answer.employee}'s manager\n`);
+        })
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
@@ -271,7 +307,7 @@ myMap.set('Add Employees', addEmployee)
 myMap.set('Add Role', addRole)
 myMap.set('Add Department', addDepartment)
 myMap.set('Update Employee Role', updateEmployeeRole)
-myMap.set('Update Employee Manager', )
+myMap.set('Update Employee Manager', updateEmployeeManager)
 myMap.set('Delete Department(s)', )
 myMap.set('Delete Role(s)', )
 myMap.set('Delete Employee(s)', )
