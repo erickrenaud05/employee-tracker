@@ -26,12 +26,18 @@ async function viewEmployee(pool){
     console.log(formTable(res.rows));
 }
 
+async function viewRole(pool){
+    const res = await pool.query('SELECT r.id, r.title, r.salary, d.name AS department FROM role r LEFT JOIN department d ON r.department_id=d.id');
+    console.log(formTable(res.rows));
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
 
 myMap.set('View All Employees', viewEmployee);
 myMap.set('Exit Employee Manager', exitEmployeeManager);
+myMap.set('View All Roles', viewRole);
 
 module.exports = myMap;
 
