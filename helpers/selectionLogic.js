@@ -1,3 +1,4 @@
+const Department = require('../models/department');
 const formTable = require('./table');
 const inquirer = require('inquirer');
 
@@ -34,7 +35,25 @@ async function viewRole(pool){
 
 async function viewBudget(pool){
     const res = await pool.query(`SELECT d.name AS department_name, SUM(r.salary) AS total_salary_spent FROM department d JOIN role r ON d.id = r.department_id JOIN employee e ON r.id = e.role_id GROUP BY d.name;`)
-    console.log(formTable(res.rows));
+    let promptChoices = ['View all departments total utilized budget'];
+    promptChoices.push(res.rows.map((x) => 'View ' + x.department_name + ' department total utilized budget'));
+    promptChoices = promptChoices.flat();
+
+    await inquirer
+        .prompt({
+            type: 'list',
+            message: 'What would you like to do?',
+            name: 'selection',
+            choices: promptChoices,
+        }).then((answer)=>{
+            for(let choices of res.rows) {
+                if(answer.selection.includes(choices.department_name)){
+                    console.log(formTable([choices]));
+                    return;
+                }
+            }
+            console.log(formTable(res.rows));
+        })
 }
 
 function exitEmployeeManager(){
