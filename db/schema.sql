@@ -94,3 +94,27 @@ JOIN
     department d ON r.department_id = d.id
 WHERE
 	LOWER(d.name) = LOWER('$(${answer.selection})')
+
+-- Query for getting all managers
+SELECT 
+    CONCAT(e.first_name,' ', e.last_name) AS manager 
+    FROM employee e 
+    JOIN employee m ON e.id=m.manager_id  
+
+-- Query for getting all employees by managers
+SELECT 
+    e.first_name AS first_name,
+    e.last_name AS last_name,
+    r.title AS role,
+    r.salary AS salary,
+    d.name AS department
+FROM 
+    employee AS e
+JOIN 
+    employee AS manager ON e.manager_id = manager.id
+JOIN 
+    role r ON e.role_id = r.id
+JOIN
+    department d ON r.department_id = d.id
+WHERE 
+	CONCAT(manager.first_name, ' ', manager.last_name) = '${anwser.selection}'   

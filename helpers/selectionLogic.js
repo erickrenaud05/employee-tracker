@@ -71,6 +71,22 @@ async function viewEmployeeByDepartment(pool){
         })
 }
 
+async function viewEmployeeByManager(pool){
+    const res = await pool.query(`SELECT CONCAT(e.first_name,' ', e.last_name) AS manager FROM employee e JOIN employee m ON e.id=m.manager_id`);
+    const promptChoices = res.rows.map((x) => x.manager);
+
+    await inquirer
+        .prompt({
+            type: 'list',
+            message: 'Select which managers employees to view',
+            name: 'selection',
+            choices: promptChoices,
+        }).then(async (answer)=>{
+            const newRes = await pool.query(`SELECT e.first_name AS first_name, e.last_name AS last_name, r.title AS role, r.salary AS salary, d.name AS department FROM employee AS e JOIN employee AS manager ON e.manager_id = manager.id JOIN role r ON e.role_id = r.id JOIN department d ON r.department_id = d.id WHERE CONCAT(manager.first_name, ' ', manager.last_name) = '${answer.selection}'   `)
+            console.log(formTable(newRes.rows));
+        })
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
@@ -80,7 +96,7 @@ myMap.set('Exit Employee Manager', exitEmployeeManager);
 myMap.set('View All Roles', viewRole);
 myMap.set('View Total Utilized Budget Of A Department', viewBudget);
 myMap.set('View Employee By Department', viewEmployeeByDepartment)
-myMap.set('View Employee By Manager', )
+myMap.set('View Employee By Manager', viewEmployeeByManager)
 myMap.set('View All Department', )
 myMap.set('Add Employees', )
 myMap.set('Add Role', )
