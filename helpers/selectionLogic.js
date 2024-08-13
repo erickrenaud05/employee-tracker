@@ -4,11 +4,11 @@ const inquirer = require('inquirer');
 
 const myMap = new Map();
 
-function viewEmployee(currentEmployees){
-    console.log(currentEmployees);
+function viewEmployee(){
+    console.log('hey');
 }
 
-function exitEmployeeManager(pool){
+function exitEmployeeManager(){
     process.exit();
 }
 
