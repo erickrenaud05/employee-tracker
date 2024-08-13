@@ -117,4 +117,8 @@ JOIN
 JOIN
     department d ON r.department_id = d.id
 WHERE 
-	CONCAT(manager.first_name, ' ', manager.last_name) = '${anwser.selection}'   
+	CONCAT(manager.first_name, ' ', manager.last_name) = '${anwser.selection}'
+
+-- Query to add employee
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES ('FirstName', 'LastName', role_id_value, manager_id_value);   

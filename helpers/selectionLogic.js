@@ -1,4 +1,5 @@
 const Department = require('../models/department');
+const Employee = require('../models/employee');
 const formTable = require('./table');
 const inquirer = require('inquirer');
 
@@ -92,6 +93,58 @@ async function viewAllDepartments(pool){
     console.log(formTable(res.rows));
 }
 
+async function addEmployee(pool) {
+    var managers = await pool.query(`SELECT CONCAT(e.first_name,' ', e.last_name) AS manager FROM employee e JOIN employee m ON e.id=m.manager_id  `)
+    var role = await pool.query(`SELECT title FROM role`);
+
+    managers = managers.rows.map((x) => x.manager);
+    role = role.rows.map((x) => x.title);
+
+    await inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: 'Employee first name: ',
+                name: 'first_name',
+                validate: input => input ? true : 'First name is required',
+            },
+            {
+                type: 'input',
+                name: 'last_name',
+                message: 'Employee last name: ',
+                validate: input => input ? true : 'Last name is required'
+            },
+            {
+                type: 'list',
+                name: 'role_id',
+                message: 'Select employees role',
+                choices: role,
+            },
+            {
+                type: 'list',
+                name: 'manager_id',
+                message: 'Select employees manager',
+                choices: managers,
+            },
+        ]).then(async (answer) => {
+            const res = await pool.query(`SELECT id FROM role WHERE LOWER(role.title)=LOWER('${answer.role_id}')`);
+            const role = res.rows;
+            const mRes = await pool.query(`SELECT id FROM employee WHERE CONCAT(first_name, ' ', last_name) = '${answer.manager_id}'`);
+            const manager = mRes.rows;
+            try{
+                await pool.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answer.first_name}', '${answer.last_name}', '${role[0].id}', '${manager[0].id}')`);  
+            } catch(err){
+                console.log(err);
+                return;
+            }
+            console.log('\nSuccessfully added employee!\n')
+        })
+}
+
+async function addRole(pool){
+
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
@@ -103,8 +156,8 @@ myMap.set('View Total Utilized Budget Of A Department', viewBudget);
 myMap.set('View Employee By Department', viewEmployeeByDepartment)
 myMap.set('View Employee By Manager', viewEmployeeByManager)
 myMap.set('View All Department', viewAllDepartments)
-myMap.set('Add Employees', )
-myMap.set('Add Role', )
+myMap.set('Add Employees', addEmployee)
+myMap.set('Add Role', addRole)
 myMap.set('Add Department', )
 myMap.set('Update Employee Role', )
 myMap.set('Update Employee Manager', )
