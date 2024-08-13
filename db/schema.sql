@@ -78,3 +78,19 @@ FROM
 LEFT JOIN 
     department d ON r.department_id=d.id
 
+-- Query to view employee per department
+SELECT 
+    e.id AS employee_id,
+    e.first_name,
+    e.last_name,
+    r.title AS title,
+    r.salary AS salary,
+    d.name AS department
+FROM 
+    employee e
+JOIN 
+    role r ON e.role_id = r.id
+JOIN 
+    department d ON r.department_id = d.id
+WHERE
+	LOWER(d.name) = LOWER('$(${answer.selection})')

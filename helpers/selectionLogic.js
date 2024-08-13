@@ -51,8 +51,7 @@ async function viewBudget(pool){
                 console.log(formTable(newRes.rows));
                 return;
             }
-            console.log(answer.selection)
-            const newRes = await pool.query(`SELECT SUM(r.salary) AS total_utilized_budget FROM employee e JOIN role r ON e.role_id = r.id JOIN department d ON r.department_id = d.id WHERE LOWER(d.name) = LOWER('${answer.selection}');`)
+            const newRes = await pool.query(`SELECT d.name AS department, SUM(r.salary) AS total_utilized_budget FROM employee e JOIN role r ON e.role_id = r.id JOIN department d ON r.department_id = d.id WHERE LOWER(d.name) = LOWER('${answer.selection}') GROUP BY d.name;`)
             console.log(formTable(newRes.rows));
         })
 }
@@ -67,8 +66,8 @@ async function viewEmployeeByDepartment(pool){
             name: 'selection',
             choices: res.rows,
         }).then(async (answer)=>{
-            const newRes = await pool.query(`SELECT * FROM department WHERE department.name=${answer.selection}`)
-            console.log(formTable(newRes));
+            const newRes = await pool.query(`SELECT e.id AS employee_id, e.first_name, e.last_name, r.title AS title, r.salary AS salary, d.name AS department FROM employee e JOIN role r ON e.role_id = r.id JOIN  department d ON r.department_id = d.id WHERE LOWER(d.name) = LOWER('${answer.selection}')`)
+            console.log(formTable(newRes.rows));
         })
 }
 
