@@ -87,6 +87,11 @@ async function viewEmployeeByManager(pool){
         })
 }
 
+async function viewAllDepartments(pool){
+    const res = await pool.query('SELECT * FROM department');
+    console.log(formTable(res.rows));
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
@@ -97,7 +102,7 @@ myMap.set('View All Roles', viewRole);
 myMap.set('View Total Utilized Budget Of A Department', viewBudget);
 myMap.set('View Employee By Department', viewEmployeeByDepartment)
 myMap.set('View Employee By Manager', viewEmployeeByManager)
-myMap.set('View All Department', )
+myMap.set('View All Department', viewAllDepartments)
 myMap.set('Add Employees', )
 myMap.set('Add Role', )
 myMap.set('Add Department', )
