@@ -1,15 +1,6 @@
-const express = require('express');
 const { Pool } = require('pg');
 const inquirer = require('inquirer');
-const startPrompt = require('./helpers/prompt');
-const drawLogo = require('./helpers/logo');
 require('dotenv').config();
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 
 const pool = new Pool(
     {
@@ -22,21 +13,52 @@ const pool = new Pool(
     console.log(`listening on port ${PORT}.`)
 )
 
-async function connectToDatabase() {
-    try {
-        await pool.connect();
-
-        drawLogo();//Logo by UofT coding bootcamp
-        startPrompt(pool);
-    } catch (err) {
-        console.log(err);
-        return 1
-    }
-    return 0;
-}
+pool.connect()
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-});
+})
 
-connectToDatabase();
+
+// const viewEmployeeQuery = 
+// `
+// SELECT
+//     e.id AS id,
+//     e.first_name AS first_name,
+// 	e.last_name AS last_name,
+//     r.title AS role,
+//     d.name AS department,
+//     r.salary AS salary,
+//     CONCAT(m.first_name, ' ', m.last_name) AS manager
+// FROM
+//     employee e
+// LEFT JOIN
+//     employee m ON e.manager_id = m.id
+// LEFT JOIN
+//     role r ON e.role_id = r.id
+// LEFT JOIN 
+//     department d ON r.department_id=d.id
+// `
+
+    
+//     //drawLogo();//Logo by UofT coding bootcamp
+//     // console.log('loading...');
+//     let currentEmployees = null;
+//     let currentRoles = null;
+//     let currentDepartments = null;    
+//     let db = [];
+
+//     pool.query(viewEmployeeQuery, function (err, { rows }) {  
+//         currentEmployees = rows;
+//         db.push(currentEmployees);
+//     })
+//     pool.query('SELECT r.id, r.title, r.salary, d.name AS department FROM role r LEFT JOIN department d ON r.department_id=d.id', function(err, { rows }){
+//         currentRoles = rows;
+//         db.push(currentRoles);
+//     })
+//     pool.query('SELECT * FROM department',  function(err, { rows }){
+//         currentDepartments = rows;
+//         db.push(currentDepartments);
+//     })
+
+//     console.log(db)

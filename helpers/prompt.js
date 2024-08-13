@@ -2,8 +2,8 @@ const inquirer = require('inquirer');
 const Employee = require('../models/employee');
 const myMap = require('../helpers/selectionLogic');
 
-module.exports = async function startPrompt(pool) {
-    var exit = false;
+async function startPrompt() {
+    var useMe = null;
     const myChoices = [
         'Exit Employee Manager',
         new inquirer.Separator(),
@@ -26,8 +26,7 @@ module.exports = async function startPrompt(pool) {
         'Delete Employee(s)',
         new inquirer.Separator(),
     ];
-    while(!exit){
-        await inquirer
+    inquirer
         .prompt({
             type: 'list',
             message: 'What would you like to do?',
@@ -35,9 +34,13 @@ module.exports = async function startPrompt(pool) {
             choices: myChoices
         })
         .then((answer) => {
-            const useMe = myMap.get(answer.selection)
-            useMe(pool);
+            useMe = myMap.get(answer.selection);
+            try{
+               useMe(db.currentEmployees)
+            } catch(err){
+                console.log(err)
+            }
         })
-    }
-
 }
+
+// startPrompt()
