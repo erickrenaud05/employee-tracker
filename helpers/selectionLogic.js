@@ -199,6 +199,23 @@ async function addRole(pool){
         })
 }
 
+async function addDepartment(pool){
+    await inquirer
+        .prompt({
+            type: 'input',
+            name: 'departmentName',
+            message: 'What is this departments name: ',
+        }).then(async(answer)=>{
+            try{
+                await pool.query(`INSERT INTO department (name) VALUES ('${answer.departmentName}')`)
+            } catch(err){
+                console.log(err);
+                return
+            }
+            console.log('Department successfully added!');
+        })
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
@@ -212,7 +229,7 @@ myMap.set('View Employee By Manager', viewEmployeeByManager)
 myMap.set('View All Department', viewAllDepartments)
 myMap.set('Add Employees', addEmployee)
 myMap.set('Add Role', addRole)
-myMap.set('Add Department', )
+myMap.set('Add Department', addDepartment)
 myMap.set('Update Employee Role', )
 myMap.set('Update Employee Manager', )
 myMap.set('Delete Department(s)', )
