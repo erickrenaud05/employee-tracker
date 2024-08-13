@@ -100,6 +100,12 @@ async function addEmployee(pool) {
     managers = managers.rows.map((x) => x.manager);
     role = role.rows.map((x) => x.title);
 
+    managers.push(new inquirer.Separator());
+    managers.push('No manager');
+    managers.push(new inquirer.Separator());
+
+    role.push(new inquirer.Separator());
+
     await inquirer
         .prompt([
             {
@@ -129,20 +135,68 @@ async function addEmployee(pool) {
         ]).then(async (answer) => {
             const res = await pool.query(`SELECT id FROM role WHERE LOWER(role.title)=LOWER('${answer.role_id}')`);
             const role = res.rows;
+
+            if(answer.manager_id === 'No manager'){
+                try{
+                    await pool.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES ('${answer.first_name}', '${answer.last_name}', '${role[0].id}')`);  
+                } catch(err){
+                    console.log(err);
+                    return;
+                }
+                console.log('\nSuccessfully added employee!\n');
+                return;
+            }
+
             const mRes = await pool.query(`SELECT id FROM employee WHERE CONCAT(first_name, ' ', last_name) = '${answer.manager_id}'`);
             const manager = mRes.rows;
+
             try{
                 await pool.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answer.first_name}', '${answer.last_name}', '${role[0].id}', '${manager[0].id}')`);  
             } catch(err){
                 console.log(err);
                 return;
             }
-            console.log('\nSuccessfully added employee!\n')
+            console.log('\nSuccessfully added employee!\n');
         })
 }
 
 async function addRole(pool){
+    const res = await pool.query('SELECT name FROM department');
+    const departments = res.rows;
+    departments.push(new inquirer.Separator());
 
+    await inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'role_title',
+                message: 'What is the new roles title: ',
+                validate: input => input ? true : 'Role title is required',
+            },
+            {
+                type: 'number',
+                name: 'salary',
+                message: 'What is the new roles salary: ',
+                validate: input => !isNaN(input) ? true : 'salary must be a number'
+            },
+            {
+                type: 'list',
+                name: 'department',
+                message: 'What department does the new role belong to: ',
+                choices: departments,
+            }
+        ]).then(async (answer) => {
+            const res = await pool.query(`SELECT id FROM department WHERE name = '${answer.department}'`);
+            const department = res.rows;
+
+            try{
+                await pool.query(`INSERT INTO role (title, salary, department_id) VALUES ('${answer.role_title}', '${answer.salary}', '${department[0].id}')`);  
+            } catch(err){
+                console.log(err);
+                return;
+            }
+            console.log('\nSuccessfully added role!\n')
+        })
 }
 
 function exitEmployeeManager(){
