@@ -121,4 +121,9 @@ WHERE
 
 -- Query to add employee
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ('FirstName', 'LastName', role_id_value, manager_id_value);   
+VALUES ('FirstName', 'LastName', role_id_value, manager_id_value);  
+
+-- Query to update employee role
+UPDATE employee
+SET role_id = new_role_id
+WHERE id = employee_id;

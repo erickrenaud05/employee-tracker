@@ -216,6 +216,46 @@ async function addDepartment(pool){
         })
 }
 
+async function updateEmployeeRole(pool){
+    const res = await pool.query(`SELECT CONCAT(first_name, ' ', last_name) FROM employee`);
+    const employees = res.rows.map((x) => x.concat);
+    const rRes = await pool.query(`SELECT title FROM role`);
+    const roles = rRes.rows.map((x) => x.title);
+
+    roles.push(new inquirer.Separator());
+    employees.push(new inquirer.Separator());
+
+    await inquirer  
+        .prompt([
+            {
+                type: 'list',
+                name: 'employee',
+                message: 'Please select the employee to change roles: ',
+                choices: employees
+            },
+            {
+                type: 'list',
+                name: 'newRole',
+                message: `Please select the employees new role: `,
+                choices: roles,
+            }
+        ]).then(async(answer) => {
+            const res = await pool.query(`SELECT id FROM employee WHERE LOWER(CONCAT(first_name, ' ', last_name))=LOWER('${answer.employee}')`)
+            const employeeId = res.rows[0].id;
+            const rRes = await pool.query(`SELECT id FROM role WHERE LOWER(title)=LOWER('${answer.newRole}')`)
+            const roleId = rRes.rows[0].id;
+
+            try{
+                await pool.query(`UPDATE employee SET role_id = '${roleId}' WHERE id = '${employeeId}';`)
+            }catch(err){
+                console.log(err);
+                return;
+            }
+
+            console.log(`Succefully updated ${answer.employee}'s role`);
+        })
+}
+
 function exitEmployeeManager(){
     process.exit();
 }
@@ -230,7 +270,7 @@ myMap.set('View All Department', viewAllDepartments)
 myMap.set('Add Employees', addEmployee)
 myMap.set('Add Role', addRole)
 myMap.set('Add Department', addDepartment)
-myMap.set('Update Employee Role', )
+myMap.set('Update Employee Role', updateEmployeeRole)
 myMap.set('Update Employee Manager', )
 myMap.set('Delete Department(s)', )
 myMap.set('Delete Role(s)', )
