@@ -1,4 +1,5 @@
 -- Populate every table
+-- Copy paste this code into pgAdmin4 query tool
 INSERT INTO department (name)
 VALUES 
     ('Engineering'),

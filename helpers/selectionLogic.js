@@ -302,8 +302,12 @@ myMap.set('Delete Department(s)', deleteDepartments)
 myMap.set('Delete Role(s)', deleteRoles)
 myMap.set('Delete Employee(s)', deleteEmployees)
 
+//These functions are for the delete and update functions. After writing all of
+//The functions, I noticed alot of repitition on those functions
+//So I made these, that way the code is shorter and easier to fix
+
 async function deleteThese(pool, deleteMe, query){
-        //Query have to be retrieve id and name. If table doesn't have name, select needed value with (AS name)
+    //Query have to be retrieve id and name. If table doesn't have name, select needed value with (AS name)
     const res = await pool.query(query);
     const choices = res.rows.map((x) => x.name);
     const map = new Map(res.rows.map(obj => [obj.name, obj.id]));

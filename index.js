@@ -3,6 +3,22 @@ const inquirer = require('inquirer');
 const myMap = require('./helpers/selectionLogic');
 const drawLogo = require('./helpers/logo');
 
+async function testConnection(){
+    try{
+        await pool.query('SELECT * FROM department');
+    } catch(err){
+        if(err.code === '3D000'){
+            console.warn(`\nPlease ensure to have set up\npgAdmin data base using the seeds provided in the\nschema and seeds file in db folder.\n`)
+        } else{
+            console.warn(`\nMake sure you've followed the install instructions,\nincluding setting up your \npgAdmin database and .env file\n`);
+        }
+        process.exit();
+    }
+    drawLogo()
+    main()
+}
+testConnection()
+
 async function main() {
     await inquirer
     .prompt({
@@ -40,5 +56,5 @@ async function main() {
     })
 }
 
-drawLogo();
-main();
+// drawLogo();
+// main();

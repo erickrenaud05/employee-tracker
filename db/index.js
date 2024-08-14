@@ -3,12 +3,12 @@ require('dotenv').config();
 
 const pool = new Pool(
     {
-        //Create .env file with the following information  DB_USER, DB_PASSWORD, DB_NAME (DB_NAME) should be employees_db
+        //Go to .env file and populate. DB_NAME should be employees_db
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         host: 'localhost',
         database: process.env.DB_NAME,
-        port: 5432,
+        port: 5432, //If trouble shouting the connection make sure your pgAdmin is listening on the proper port
     }
 )
 

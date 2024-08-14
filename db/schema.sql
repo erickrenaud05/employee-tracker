@@ -1,3 +1,7 @@
+-- If you wish to create or restart data base, follow these instructions
+-- down to the ones that say SQL QUERIES FOR FUNCTIONS
+-- desired pgAdmin server query tool
+
 DROP DATABASE IF EXISTS employees_db;
 CREATE DATABASE employees_db;
 
