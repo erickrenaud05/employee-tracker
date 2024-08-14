@@ -21,6 +21,8 @@ LEFT JOIN
     role r ON e.role_id = r.id
 LEFT JOIN 
     department d ON r.department_id=d.id
+ORDER BY
+    department
 `
 const myMap = new Map();
 
@@ -73,7 +75,7 @@ async function viewEmployeeByDepartment(pool){
 }
 
 async function viewEmployeeByManager(pool){
-    const res = await pool.query(`SELECT CONCAT(e.first_name,' ', e.last_name) AS manager FROM employee e JOIN employee m ON e.id=m.manager_id`);
+    const res = await pool.query(`SELECT CONCAT(e.first_name,' ', e.last_name) AS manager FROM employee e JOIN employee m ON e.id=m.manager_id GROUP BY e.id`);
     const promptChoices = res.rows.map((x) => x.manager);
 
     await inquirer
@@ -94,7 +96,7 @@ async function viewAllDepartments(pool){
 }
 
 async function addEmployee(pool) {
-    var managers = await pool.query(`SELECT CONCAT(e.first_name,' ', e.last_name) AS manager FROM employee e JOIN employee m ON e.id=m.manager_id  `)
+    var managers = await pool.query(`SELECT CONCAT(first_name,' ', last_name) AS manager FROM employee`)
     var role = await pool.query(`SELECT title FROM role`);
 
     managers = managers.rows.map((x) => x.manager);
@@ -174,7 +176,7 @@ async function addRole(pool){
                 validate: input => input ? true : 'Role title is required',
             },
             {
-                type: 'number',
+                type: 'input',
                 name: 'salary',
                 message: 'What is the new roles salary: ',
                 validate: input => !isNaN(input) ? true : 'salary must be a number'
@@ -319,7 +321,6 @@ async function deleteEmployees(pool){
             for(let i = 0; i < answer.employees.length; i++){
                 const res = await pool.query(`SELECT id FROM employee WHERE CONCAT(first_name, ' ', last_name)='${answer.employees[i]}'`)
                 const employeeId = res.rows[0].id;
-                console.log(employeeId)
                 try{
                     await pool.query(`DELETE FROM employee WHERE id = '${employeeId}';`)
                 } catch(err){
@@ -330,6 +331,84 @@ async function deleteEmployees(pool){
 
             console.log(`\nSuccessfully deleted the following employee('s): ${answer.employees}\n`);
         })
+}
+
+async function deleteDepartments(pool){
+    const res = await pool.query('SELECT name FROM department');
+    const departments = res.rows.map((x) => x.name);
+
+    departments.push(new inquirer.Separator());
+
+    await inquirer  
+        .prompt([
+            {
+            type: 'checkbox',
+            name: 'department',
+            message: `Select the department('s) you would like to delete`,
+            choices: departments,
+        },
+        {
+            type: 'confirm',
+            name: 'doubleCheck',
+            message: 'Are you sure you wish to delete the selected employees, this is irreversible!',
+        }])
+        .then(async(answer) => {
+            if(!answer.doubleCheck){
+                console.log('\nOK! No departments have been deleted!\n');
+                return;
+            }
+            
+            for(let i = 0; i < answer.department.length; i++){
+                const res = await pool.query(`SELECT id FROM department WHERE LOWER(name)=LOWER('${answer.department[i]}')`)
+                const departmentId = res.rows[0].id;
+                try{
+                    await pool.query(`DELETE FROM department WHERE id = '${departmentId}';`)
+                } catch(err){
+                    console.log(err);
+                    return;
+                }
+            }
+            console.log(`\nSuccessfully deleted the following department('s): ${answer.department}\n`);
+        })
+}
+
+async function deleteRoles(pool){
+    const res = await pool.query('SELECT title FROM role');
+    const roles = res.rows.map((x) => x.title);
+
+    roles.push(new inquirer.Separator());
+
+    await inquirer
+    .prompt([
+        {
+            type: 'checkbox',
+            name: 'roles',
+            message: `Select role('s) you would like to delete: `,
+            choices: roles,
+        },
+        {
+            type: 'confirm',
+            name: 'doubleCheck',
+            message: 'Are you sure you wish to delete the selected roles, this is irreversible!',
+        }
+    ]).then(async(answer) => {
+        if(!answer.doubleCheck){
+            console.log('\nOK! No roles have been deleted!\n');
+            return;
+        }
+        for(let i = 0; i < answer.roles.length; i++){
+            const res = await pool.query(`SELECT id FROM role WHERE LOWER(title)=LOWER('${answer.roles[i]}')`)
+            const roleId = res.rows[0].id;
+            try{
+                await pool.query(`DELETE FROM employee WHERE id = '${roleId}';`)
+            } catch(err){
+                console.log(err);
+                return;
+            }
+        }
+
+        console.log(`\nSuccessfully deleted the following role('s): ${answer.roles}\n`);
+    })
 }
 
 function exitEmployeeManager(){
@@ -348,8 +427,8 @@ myMap.set('Add Role', addRole)
 myMap.set('Add Department', addDepartment)
 myMap.set('Update Employee Role', updateEmployeeRole)
 myMap.set('Update Employee Manager', updateEmployeeManager)
-myMap.set('Delete Department(s)', )
-myMap.set('Delete Role(s)', )
+myMap.set('Delete Department(s)', deleteDepartments)
+myMap.set('Delete Role(s)', deleteRoles)
 myMap.set('Delete Employee(s)', deleteEmployees)
 
 module.exports = myMap;
